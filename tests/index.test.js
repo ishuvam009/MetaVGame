@@ -1,33 +1,48 @@
-const { default: expect } = require("expect");
+const axios = require('axios');
 
-function sum(a,b){
-    return a+b;
-}
+const BACKEND_URL = "http://localhost:4000";
 
-function subs(a,b){
-    return a-b;
-}
+describe("Authentication", () => {
 
-function multi(a,b){
-    return a*b;
-}
+    test('User is able to signup only once.',async() => {
+        const username = "Shuvam"+Math.random();
+        const password = "1234567";
 
-test('Sum of 1 and 2 is 3',()=>{
-    let ans = sum(1,2);
-    expect(ans).toBe(3);
-});
+        const response = await axios.post(`${BACKEND_URL}/api/v1/signup`,{
+            username,
+            password,
+            type: "admin"
+        });
 
-test('Sub of 5 - 3 is 2',()=>{
-    let anss = subs(5,2);
-    expect(anss).toBe(3);
-});
+        expect(response.statusCode).toBe(200);
 
-test('addition of 5 and 5 is not 12 NotToBe',()=>{
-    let ansi = sum(5,5);
-    expect(ansi).not.toBe(12);
-});
+        const upDatedResponse = await axios.post(`${BACKEND_URL}/api/v1/signup`,{
+            username,
+            password,
+            type: "admin"
+        })
 
-test('Multiplication of 3 * 5', ()=>{
-    let mul = multi(3,5);
-    expect(mul).toBe(15);
+        expect(upDatedResponse.statusCode).toBE(400);
+    });
+
+    test('User signup fails if username is empty.', async() => {
+        const username = `shuvam-${Math.randm()}`;
+        const password = "123456";
+
+        const response = await axios.post(`${BACKEND_URL}/api/v1/signup`);
+        expect(response.statusCode).toBe(400);
+    });
+
+    test('Signin sucessced if username and password is correct.', async() => {
+        const username = `shuvam${Math.random()}`;
+        const password = "123456";
+
+        const response = await axios.post(`${BACKEND_URL/api/v1/signup}`,{
+            username,
+            password
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.token).toBeDefined();
+    })
 });

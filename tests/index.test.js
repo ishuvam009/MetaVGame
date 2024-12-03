@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { beforeAll } = require('jest-circus');
 const { describe } = require('yargs');
 
 const BACKEND_URL = "http://localhost:4000";
@@ -72,6 +73,8 @@ describe("Authentication", () => {
 });
 
 describe("User information endpoint", () => {
-
+    beforeAll( () =>{
+        console.log('Before all it was called.');
+    })
     tset()
 })

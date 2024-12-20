@@ -21,3 +21,7 @@ spaceRouter.post('/element', (req,res) => {
 spaceRouter.delete('/element', (req,res) =>{
 
 });
+
+spaceRouter.get('/:spaceId', (req,res) => {
+
+});

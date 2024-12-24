@@ -28,8 +28,9 @@ model Space {
   width         Int
   height        Int?
   thumbnail     String?
-  creatorId       String
-  creator         User     @relation(fields: [creatorId], references: [id])
+  creatorId     String
+  creator       User     @relation(fields: [creatorId], references: [id])
+  element       spaceElements[]
 }
 
 model spaceElements {
@@ -38,6 +39,8 @@ model spaceElements {
   spaceId       String
   x             Int
   y             Int
+  space         Space @relation(fields: [spaceId], references: [id])
+  element       Element @relation(fields: [elementId], references: [id])
 }
 
 model Element {
@@ -45,6 +48,8 @@ model Element {
   width         Int
   height        Int
   imageUrl      String
+  space         spaceElements[]
+  mapsElement   mapElements[]
 }
 
 model Map {
@@ -52,6 +57,7 @@ model Map {
   width         Int
   height        Int
   name          String
+  maps          mapElements[]
 }
 
 model mapElements {
@@ -60,6 +66,8 @@ model mapElements {
   elementId     String?
   x             Int?
   y             Int?
+  map           Map @relation(fields: [mapId], references: [id])
+  element       Element? @relation(fields: [elementId], references: [id])
 }
 
 model Avatr {

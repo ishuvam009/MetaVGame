@@ -17,9 +17,10 @@ model User {
   id             String @id @unique @default(cuid())
   userName       String @unique
   password       String @unique
-  avatarId       String?
+  avatarId       String
   role           Role
   space          Space[]
+  avatar        Avatr @relation(fields: [avatarId], references: [id])
 }
 
 model Space {
@@ -63,17 +64,18 @@ model Map {
 model mapElements {
   id            String @id @unique @default(cuid())
   mapId         String
-  elementId     String?
+  elementId     String
   x             Int?
   y             Int?
   map           Map @relation(fields: [mapId], references: [id])
-  element       Element? @relation(fields: [elementId], references: [id])
+  element       Element @relation(fields: [elementId], references: [id])
 }
 
 model Avatr {
   id            String @id @unique @default(cuid())
   imageUrl      String?
   name          String?
+  users         User[]
 }
 
 enum Role {

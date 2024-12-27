@@ -16,11 +16,11 @@ datasource db {
 model User {
   id             String @id @unique @default(cuid())
   userName       String @unique
-  password       String @unique
-  avatarId       String
+  password       String 
+  avatarId       String?
   role           Role
   space          Space[]
-  avatar        Avatr @relation(fields: [avatarId], references: [id])
+  avatar        Avatr? @relation(fields: [avatarId], references: [id])
 }
 
 model Space {

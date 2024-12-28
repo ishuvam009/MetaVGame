@@ -5,10 +5,11 @@ import { spaceRouter } from "./space";
 import { SigninSchema } from "../../types";
 import { SignupSchema } from "../../types";
 import client from "@repo/db/client";
+import { date } from "zod";
 
 export const router = Router();
 
-router.post('/signup', (req,res) => {
+router.post('/signup', async (req,res) => {
     const parsedData = SignupSchema.safeParse(req.body)
     if(!parsedData.success){
          res.status(400).json({
@@ -18,7 +19,14 @@ router.post('/signup', (req,res) => {
     }else
 
     try {
-        
+        await client.user.create({
+            data: {
+                userName: parsedData.data.username,
+                password: parsedData.data.password,
+                role: parsedData.data.type === "admin" ? "Admin" : "User",
+            }
+        })
+
     } catch (error) {
         
     }

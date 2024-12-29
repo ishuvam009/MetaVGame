@@ -26,14 +26,14 @@ router.post('/signup', async (req,res) => {
                 role: parsedData.data.type === "admin" ? "Admin" : "User",
             }
         })
-
-    } catch (error) {
-        
-    }
-
     res.status(200).json({
         message: 'Signup Successful',
     })
+    } catch (error) {
+        res.status(400).json({
+            message: 'User already exist.'
+        })
+    }
 });
 
 router.post('/signin', (req,res) => {

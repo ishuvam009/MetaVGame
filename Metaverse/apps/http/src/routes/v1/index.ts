@@ -6,8 +6,9 @@ import { SigninSchema } from "../../types";
 import { SignupSchema } from "../../types";
 import client from "@repo/db/client";
 import bcrypt from "bcrypt";
-import { Jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { date } from "zod";
+import { JWT_PASSWORD } from "../../config";
 
 export const router = Router();
 
@@ -40,7 +41,7 @@ router.post('/signup', async (req,res) => {
     }
 });
 
-router.post('/signin', (req,res) => {
+router.post('/signin', async (req,res) => {
     const parsedData = SigninSchema.safeParse(req.body);
     if(!parsedData.success){
         res.status(403).json({
@@ -49,7 +50,7 @@ router.post('/signin', (req,res) => {
         return
     }
     try {
-        const user = client.user.findUnique({
+        const user = await client.user.findUnique({
             where: {
                 userName: parsedData.data.username,
             }
@@ -61,9 +62,29 @@ router.post('/signin', (req,res) => {
             return
         }
 
-       
-    } catch (error) {
+        const isValidPassword = await bcrypt.compare(parsedData.data.password, user.password);
+
+        if(!isValidPassword){
+            res.status(403).json({
+                message: "Invalid Password.",
+            })
+        }
+
+        const jwtToken = jwt.sign({
+            userName: user.userName,
+            userId: user.id,
+            role: user.role,
+        }, JWT_PASSWORD);
+
+        res.json({
+            jwtToken
+        })
         
+
+    } catch (error) {
+        res.status(400).json({
+            message: "Internal server error."
+        })
     }
 });
 

@@ -5,6 +5,8 @@ import { spaceRouter } from "./space";
 import { SigninSchema } from "../../types";
 import { SignupSchema } from "../../types";
 import client from "@repo/db/client";
+import bcrypt from "bcrypt";
+import { Jwt } from "jsonwebtoken";
 import { date } from "zod";
 
 export const router = Router();
@@ -16,18 +18,20 @@ router.post('/signup', async (req,res) => {
             message: "Validation failed."
         })
         return 
-    }else
+    }
+
+    const hashedPassword = await bcrypt.hash(parsedData.data.password,10);
 
     try {
-        await client.user.create({
+        const user = await client.user.create({
             data: {
                 userName: parsedData.data.username,
-                password: parsedData.data.password,
+                password: hashedPassword,
                 role: parsedData.data.type === "admin" ? "Admin" : "User",
             }
         })
     res.status(200).json({
-        message: 'Signup Successful',
+        userId: user.id,
     })
     } catch (error) {
         res.status(400).json({
@@ -37,9 +41,30 @@ router.post('/signup', async (req,res) => {
 });
 
 router.post('/signin', (req,res) => {
-    res.status(200).json({
-        message: 'Signin Successful.',
-    })
+    const parsedData = SigninSchema.safeParse(req.body);
+    if(!parsedData.success){
+        res.status(403).json({
+            message: "Valiadtion Failed.",
+        })
+        return
+    }
+    try {
+        const user = client.user.findUnique({
+            where: {
+                userName: parsedData.data.username,
+            }
+        })
+        if(!user){
+            res.status(403).json({
+                message: "User not found.",
+            })
+            return
+        }
+
+       
+    } catch (error) {
+        
+    }
 });
 
 router.get('/elements',(req,res) => {

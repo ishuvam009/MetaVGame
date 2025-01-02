@@ -5,7 +5,7 @@ import { spaceRouter } from "./space";
 import { SigninSchema } from "../../types";
 import { SignupSchema } from "../../types";
 import client from "@repo/db/client";
-import bcrypt from "bcrypt";
+import {hash, compare} from "../../scrypt";
 import jwt from "jsonwebtoken";
 import { date } from "zod";
 import { JWT_PASSWORD } from "../../config";
@@ -21,7 +21,7 @@ router.post('/signup', async (req,res) => {
         return 
     }
 
-    const hashedPassword = await bcrypt.hash(parsedData.data.password,10);
+    const hashedPassword = await hash(parsedData.data.password);
 
     try {
         const user = await client.user.create({
@@ -62,7 +62,7 @@ router.post('/signin', async (req,res) => {
             return
         }
 
-        const isValidPassword = await bcrypt.compare(parsedData.data.password, user.password);
+        const isValidPassword = await compare(parsedData.data.password, user.password);
 
         if(!isValidPassword){
             res.status(403).json({

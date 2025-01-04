@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { UpdateMetadataSchema } from "../../types";
 import client from "@repo/db/client";
+import { userMiddleware } from "../../middleware/user";
 
 export const userRouter = Router();
 
-userRouter.post("/metadata", (req,res) => {
+userRouter.post("/metadata", userMiddleware, async (req,res) => {
     const parsedData = UpdateMetadataSchema.safeParse(req.body);
 
     if(!parsedData.success){
@@ -14,5 +15,15 @@ userRouter.post("/metadata", (req,res) => {
         return
     }
 
-    client.user.update;
+    await client.user.update({
+        where: {
+            id: req.userId,
+        },
+        data: {
+            avatarId: parsedData.data.avatarId,
+        }
+    });
+    res.json({
+        message: "Metadata updated."
+    })
 })

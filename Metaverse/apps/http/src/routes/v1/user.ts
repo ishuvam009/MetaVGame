@@ -26,4 +26,8 @@ userRouter.post("/metadata", userMiddleware, async (req,res) => {
     res.json({
         message: "Metadata updated."
     })
+});
+
+userRouter.get("/metadata/bulk", (req,res) => {
+    
 })

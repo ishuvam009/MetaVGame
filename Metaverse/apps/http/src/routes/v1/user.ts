@@ -29,5 +29,5 @@ userRouter.post("/metadata", userMiddleware, async (req,res) => {
 });
 
 userRouter.get("/metadata/bulk", (req,res) => {
-    
+    const userIds = req.query.userIds?.split(",")
 })

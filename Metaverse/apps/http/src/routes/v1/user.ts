@@ -28,6 +28,23 @@ userRouter.post("/metadata", userMiddleware, async (req,res) => {
     })
 });
 
-userRouter.get("/metadata/bulk", (req,res) => {
-    const userIds = req.query.userIds?.split(",")
+userRouter.get("/metadata/bulk", async (req,res) => {
+    const userIdString = (req.query.ids ?? "[]") as String;
+    const userIds = (userIdString).slice(1, userIdString?.length - 2).split(",");
+    const metadta = await client.user.findMany({
+        where: {
+            id: {
+                in: userIds
+            }
+        }, select: {
+            avatar: true,
+            id: true
+        }
+    })
+    res.json({
+        avatars: metadta.map(m => ({
+            userId: m.id,
+            avatarId: m.avatar?.imageUrl
+        }))
+    })
 })
